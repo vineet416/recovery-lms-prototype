@@ -1,0 +1,11 @@
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+notes/
+.env
+data/big_accounts.csv
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.DS_Store
