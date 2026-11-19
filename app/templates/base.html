@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shaha Finlease LMS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+  <header class="container">
+    <nav>
+      <ul><li><strong>Shaha Finlease LMS</strong></li></ul>
+      {% if user %}
+      <ul>
+        <li>{{ user.name }} ({{ user.role }})</li>
+        <li>
+          <form method="post" action="/logout"><button type="submit">Logout</button></form>
+        </li>
+      </ul>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="container">
+    {% include "_flash.html" %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
