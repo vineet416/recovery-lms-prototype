@@ -1,7 +1,10 @@
 services:
   db:
     image: postgres:16
-    env_file: .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lms}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lms}
+      POSTGRES_DB: ${POSTGRES_DB:-lms}
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -12,8 +15,9 @@ services:
 
   app:
     build: .
-    env_file: .env
     environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://lms:lms@db:5432/lms}
+      SECRET_KEY: ${SECRET_KEY:-change-me}
       TZ: Asia/Kolkata
       WATCHFILES_FORCE_POLLING: "true"
     ports:
