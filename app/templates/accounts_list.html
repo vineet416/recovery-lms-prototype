@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Accounts</h2>
+<form method="get" action="/accounts" role="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="Customer name, mobile or loan number">
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for s in statuses %}
+    <option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Search</button>
+</form>
+
+<p><strong>{{ total }}</strong> account{{ "" if total == 1 else "s" }} found</p>
+
+{% if accounts %}
+<table>
+  <thead>
+    <tr><th>Loan no</th><th>Customer</th><th>Mobile</th><th>Office</th>
+        <th>Outstanding</th><th>Status</th><th>Owner</th></tr>
+  </thead>
+  <tbody>
+    {% for a in accounts %}
+    <tr>
+      <td><a href="/accounts/{{ a.id }}">{{ a.loan_no }}</a></td>
+      <td>{{ a.customer_name }}</td>
+      <td>{{ a.mobile }}</td>
+      <td>{{ offices.get(a.office_id, "") }}</td>
+      <td>{{ "{:,.2f}".format(a.outstanding) }}</td>
+      <td>{{ a.status }}</td>
+      <td>{{ names.get(a.owner_id, "Unallocated") }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% include "_pagination.html" %}
+{% else %}
+<p>No accounts to show.</p>
+{% endif %}
+{% endblock %}

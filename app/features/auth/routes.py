@@ -11,10 +11,10 @@ from app.models import User
 router = APIRouter()
 
 
-# Home page (logged-out visitors are sent to the login page by get_current_user).
+# Home sends logged-in users to the account list (logged-out visitors go to /login via get_current_user).
 @router.get("/")
-def home(request: Request, user: User = Depends(get_current_user)):
-    return templates.TemplateResponse(request, "home.html", {"user": user})
+def home(user: User = Depends(get_current_user)):
+    return RedirectResponse("/accounts", status_code=303)
 
 
 # Shows the login form.

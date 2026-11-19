@@ -1,0 +1,14 @@
+{% set link_start = "/accounts?q=" ~ (q | urlencode) ~ "&status=" ~ (status | urlencode) ~ "&page=" %}
+<nav>
+  <ul>
+    <li>
+      {% if page > 1 %}<a href="{{ link_start }}{{ page - 1 }}">&laquo; Previous</a>{% endif %}
+    </li>
+  </ul>
+  <ul><li>Page {{ page }} of {{ last_page }}</li></ul>
+  <ul>
+    <li>
+      {% if page < last_page %}<a href="{{ link_start }}{{ page + 1 }}">Next &raquo;</a>{% endif %}
+    </li>
+  </ul>
+</nav>

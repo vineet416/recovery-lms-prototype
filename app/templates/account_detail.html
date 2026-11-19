@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<p><a href="/accounts">&laquo; Back to accounts</a></p>
+<h2>{{ account.customer_name }} <small>({{ account.loan_no }})</small></h2>
+
+<article>
+  <div class="grid">
+    <div>
+      <p><strong>Mobile:</strong> {{ account.mobile }}</p>
+      <p><strong>Email:</strong> {{ account.email or "-" }}</p>
+      <p><strong>City:</strong> {{ account.city or "-" }}, {{ account.state or "-" }}</p>
+      <p><strong>Office:</strong> {{ office_name }}</p>
+      <p><strong>Language:</strong> {{ account.language or "-" }}</p>
+    </div>
+    <div>
+      <p><strong>Product:</strong> {{ account.product or "-" }}</p>
+      <p><strong>Portfolio:</strong> {{ account.portfolio or "-" }} ({{ account.seller_bank or "-" }})</p>
+      <p><strong>Original amount:</strong> {{ "{:,.2f}".format(account.original_amount) }}</p>
+      <p><strong>NPA date:</strong> {{ account.npa_date or "-" }}</p>
+      <p><strong>Last payment date:</strong> {{ account.last_payment_date or "-" }}</p>
+    </div>
+    <div>
+      <p><strong>Outstanding:</strong> {{ "{:,.2f}".format(account.outstanding) }}</p>
+      <p><strong>Total paid:</strong> {{ "{:,.2f}".format(account.total_paid) }}</p>
+      <p><strong>Status:</strong> {{ account.status }}</p>
+      <p><strong>Next follow-up:</strong> {{ account.next_followup or "-" }}</p>
+      <p><strong>Owner:</strong> {{ names.get(account.owner_id, "Unallocated") }}</p>
+      <p><strong>Manager:</strong> {{ names.get(account.manager_id, "-") }}</p>
+    </div>
+  </div>
+</article>
+
+<h3>Call history</h3>
+{% if calls %}
+<table>
+  <thead><tr><th>When</th><th>By</th><th>Disposition</th><th>Remarks</th><th>Next follow-up</th></tr></thead>
+  <tbody>
+    {% for c in calls %}
+    <tr><td>{{ c.created_at.strftime("%d %b %Y %H:%M") }}</td><td>{{ names.get(c.user_id, c.user_id) }}</td>
+        <td>{{ c.disposition }}</td><td>{{ c.remarks or "" }}</td><td>{{ c.next_followup or "" }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}<p>No calls yet.</p>{% endif %}
+
+<h3>Promises to pay</h3>
+{% if promises %}
+<table>
+  <thead><tr><th>Made on</th><th>By</th><th>Amount</th><th>Promise date</th><th>State</th></tr></thead>
+  <tbody>
+    {% for p in promises %}
+    <tr><td>{{ p.created_at.strftime("%d %b %Y") }}</td><td>{{ names.get(p.user_id, p.user_id) }}</td>
+        <td>{{ "{:,.2f}".format(p.amount) }}</td><td>{{ p.promise_date }}</td><td>{{ p.state }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}<p>No promises yet.</p>{% endif %}
+
+<h3>Payments</h3>
+{% if payments %}
+<table>
+  <thead><tr><th>Paid on</th><th>By</th><th>Amount</th><th>Settlement</th></tr></thead>
+  <tbody>
+    {% for p in payments %}
+    <tr><td>{{ p.paid_on }}</td><td>{{ names.get(p.user_id, p.user_id) }}</td>
+        <td>{{ "{:,.2f}".format(p.amount) }}</td><td>{{ "Yes" if p.is_settlement else "No" }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}<p>No payments yet.</p>{% endif %}
+
+<h3>Allocation history</h3>
+{% if history %}
+<table>
+  <thead><tr><th>When</th><th>From</th><th>To</th><th>By</th></tr></thead>
+  <tbody>
+    {% for h in history %}
+    <tr><td>{{ h.created_at.strftime("%d %b %Y %H:%M") }}</td><td>{{ names.get(h.from_user_id, "Unallocated") }}</td>
+        <td>{{ names.get(h.to_user_id, h.to_user_id) }}</td><td>{{ names.get(h.by_user_id, h.by_user_id) }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}<p>No allocation history yet.</p>{% endif %}
+{% endblock %}

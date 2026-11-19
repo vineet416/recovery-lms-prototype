@@ -12,6 +12,7 @@
       <ul><li><strong>Shaha Finlease LMS</strong></li></ul>
       {% if user %}
       <ul>
+        <li><a href="/accounts">Accounts</a></li>
         {% if user.role == "head" %}<li><a href="/upload">Upload</a></li>{% endif %}
         <li>{{ user.name }} ({{ user.role }})</li>
         <li>
