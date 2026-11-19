@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Upload accounts</h2>
+<p>Choose a CSV file with the same columns as accounts_10000.csv. Existing loan numbers are skipped.</p>
+<form method="post" action="/upload" enctype="multipart/form-data">
+  <input type="file" name="file" accept=".csv" required>
+  <button type="submit">Upload</button>
+</form>
+{% if summary %}
+<article>
+  <h3>Upload finished</h3>
+  <ul>
+    <li>Inserted: <strong>{{ summary.inserted }}</strong></li>
+    <li>Duplicates (already in the system): <strong>{{ summary.duplicates }}</strong></li>
+    <li>Skipped bad rows: <strong>{{ summary.skipped }}</strong></li>
+  </ul>
+</article>
+{% endif %}
+{% endblock %}

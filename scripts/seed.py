@@ -7,9 +7,11 @@ from sqlalchemy.orm import Session
 from app.core.constants import DEMO_PASSWORD
 from app.core.database import SessionLocal, create_tables
 from app.core.security import hash_password
+from app.features.upload.service import load_accounts_csv
 from app.models import Office, User
 
 USERS_CSV = "data/users_seed.csv"
+ACCOUNTS_CSV = "data/accounts_10000.csv"
 
 
 # Reads every row of the users CSV into a list of dictionaries.
@@ -51,7 +53,7 @@ def print_counts(db: Session) -> None:
         print(f"{role}s:" if role in ("manager", "caller") else f"{role}:", count)
 
 
-# Creates tables, then loads offices and users (accounts come in a later step).
+# Creates tables, then loads offices, users and (unless skipped) the accounts CSV.
 def seed_everything(load_accounts: bool = True) -> None:
     create_tables()
     rows = read_users_csv()
@@ -60,7 +62,9 @@ def seed_everything(load_accounts: bool = True) -> None:
         seed_users(db, rows, office_ids)
         db.commit()
         print_counts(db)
-    # Account loading is added in Step 4 and will honour load_accounts.
+        if load_accounts:
+            with open(ACCOUNTS_CSV, newline="", encoding="utf-8-sig") as csv_file:
+                print("accounts:", load_accounts_csv(db, csv_file))
 
 
 # Reads the command line options and runs the seed.
