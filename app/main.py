@@ -6,6 +6,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.core.config import SECRET_KEY
 from app.core.templates import templates
 from app.features.accounts.routes import router as accounts_router
+from app.features.allocation.routes import router as allocation_router
 from app.features.auth.routes import router as auth_router
 from app.features.upload.routes import router as upload_router
 
@@ -14,6 +15,7 @@ app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 app.include_router(auth_router)
 app.include_router(upload_router)
 app.include_router(accounts_router)
+app.include_router(allocation_router)
 
 
 # Shows a friendly page for errors; a missing login (401) goes to the login page instead.

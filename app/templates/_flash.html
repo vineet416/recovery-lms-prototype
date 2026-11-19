@@ -1,3 +1,9 @@
+{% set flash = pop_flash(request) %}
+{% if flash %}
+<article style="border-left: 6px solid {{ 'green' if flash.kind == 'success' else 'crimson' }};">
+  <p>{{ flash.text }}</p>
+</article>
+{% endif %}
 {% if message %}
 <article><p>{{ message }}</p></article>
 {% endif %}

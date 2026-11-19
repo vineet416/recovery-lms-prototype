@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Allocation</h2>
+<nav>
+  <ul>
+    <li><a href="/allocation?which=unallocated" {% if which == "unallocated" %}aria-current="page"{% endif %}>Unallocated</a></li>
+    <li><a href="/allocation?which=allocated" {% if which == "allocated" %}aria-current="page"{% endif %}>Allocated</a></li>
+  </ul>
+</nav>
+
+{% if user.role == "manager" %}
+<form method="post" action="/allocation/auto">
+  <button type="submit" class="secondary">Auto-allocate all my unallocated accounts</button>
+</form>
+{% endif %}
+
+<p><strong>{{ total }}</strong> {{ which }} account{{ "" if total == 1 else "s" }}</p>
+
+{% if accounts %}
+<form method="post" action="/allocation/assign">
+  <input type="hidden" name="which" value="{{ which }}">
+  <select name="caller_id" required>
+    <option value="">Choose a caller</option>
+    {% for c in callers %}<option value="{{ c.id }}">{{ c.name }} ({{ c.id }})</option>{% endfor %}
+  </select>
+  <button type="submit">Allocate selected</button>
+
+  <table>
+    <thead>
+      <tr><th></th><th>Loan no</th><th>Customer</th><th>Outstanding</th><th>Status</th><th>Owner</th></tr>
+    </thead>
+    <tbody>
+      {% for a in accounts %}
+      <tr>
+        <td><input type="checkbox" name="account_ids" value="{{ a.id }}"></td>
+        <td><a href="/accounts/{{ a.id }}">{{ a.loan_no }}</a></td>
+        <td>{{ a.customer_name }}</td>
+        <td>{{ "{:,.2f}".format(a.outstanding) }}</td>
+        <td>{{ a.status }}</td>
+        <td>{{ names.get(a.owner_id, "Unallocated") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
+<nav>
+  <ul><li>{% if page > 1 %}<a href="/allocation?which={{ which }}&page={{ page - 1 }}">&laquo; Previous</a>{% endif %}</li></ul>
+  <ul><li>Page {{ page }} of {{ last_page }}</li></ul>
+  <ul><li>{% if page < last_page %}<a href="/allocation?which={{ which }}&page={{ page + 1 }}">Next &raquo;</a>{% endif %}</li></ul>
+</nav>
+{% else %}
+<p>No accounts to show.</p>
+{% endif %}
+{% endblock %}
