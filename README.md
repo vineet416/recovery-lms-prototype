@@ -87,13 +87,99 @@ Dockerfile, docker-compose.yml, entrypoint.sh, requirements.txt
 
 ## Quick start
 
+You do not need Python, PostgreSQL or Node on your computer. You only need Git and Docker.
+
+### 1. Prerequisites
+
+| Needed | Why | Notes |
+|---|---|---|
+| Git | download the code | any recent version |
+| Docker with Docker Compose v2 | runs the app and the database | Docker Desktop (Windows, macOS) already includes Compose; on Linux use Docker Engine with the Compose plugin |
+| Free port 8000 | the app opens here | stop anything else that uses it |
+| Internet and about 2 GB of disk | pulls the Python and PostgreSQL images; the page style loads from a CDN | first start only |
+
+On Windows, Docker Desktop needs WSL 2 and CPU virtualization turned on in the BIOS. Its installer sets up WSL 2 and may ask for a restart.
+
+### 2. Install Git and Docker
+
+Windows (PowerShell), or use the links below:
+
+```
+winget install -e --id Git.Git
+winget install -e --id Docker.DockerDesktop
+```
+
+Restart if asked, then open Docker Desktop and wait until it says it is running.
+
+macOS (Homebrew), or use the links below:
+
+```
+brew install git
+brew install --cask docker
+```
+
+Open the Docker app once and wait until it says it is running.
+
+Linux (Ubuntu or Debian):
+
+```
+sudo apt update && sudo apt install -y git curl
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+```
+
+Log out and back in so the `docker` group applies. Other Linux distributions: follow the Docker Engine guide.
+
+Official guides:
+- Git: https://git-scm.com/downloads
+- Docker Desktop for Windows: https://docs.docker.com/desktop/setup/install/windows-install/
+- Docker Desktop for macOS: https://docs.docker.com/desktop/setup/install/mac-install/
+- Docker Engine for Linux: https://docs.docker.com/engine/install/
+
+Check that everything is installed (each command should print a version):
+
+```
+git --version
+docker --version
+docker compose version
+```
+
+### 3. Get the code
+
+```
+git clone https://github.com/vineet416/recovery-lms-prototype.git
+cd recovery-lms-prototype
+```
+
+### 4. Start the app
+
 ```
 docker compose up --build
 ```
 
-Open http://localhost:8000. No `.env` file is needed; compose has safe defaults
-(`.env.example` shows the variables). On first start the database is filled with
-offices, users and 10,000 accounts.
+The first start takes a few minutes: it downloads the images, builds the app and fills the
+database with offices, users and 10,000 accounts. It is ready when the log shows
+`Uvicorn running on http://0.0.0.0:8000`. No `.env` file is needed; compose has safe defaults
+(`.env.example` shows the variables). To run it in the background instead, use
+`docker compose up --build -d` and watch it with `docker compose logs -f app`.
+
+### 5. Open it and log in
+
+1. Open http://localhost:8000 in a browser.
+2. Log in as `head` with password `demo123` (all logins are in the table below).
+3. Click **Accounts**. You should see 10,000 accounts, 50 per page.
+
+### 6. Stop it
+
+Press Ctrl+C in the terminal (or run `docker compose down` from the project folder). To also delete
+the database, run `docker compose down -v`; the next start loads fresh demo data.
+
+### Troubleshooting
+
+- `Cannot connect to the Docker daemon`: start Docker Desktop (Windows, macOS) or run `sudo systemctl start docker` (Linux).
+- `permission denied` on `/var/run/docker.sock` (Linux): finish the `usermod` step and log in again, or put `sudo` before the command.
+- `port is already allocated` or `address already in use`: another program uses port 8000. Stop it, or change `8000:8000` to `8001:8000` in `docker-compose.yml` and open http://localhost:8001.
+- Windows says virtualization or WSL 2 is missing: turn on virtualization in the BIOS, then run `wsl --update` and restart.
 
 ## Demo logins
 
@@ -116,6 +202,16 @@ docker compose exec app python -m scripts.reset_demo --no-accounts
 
 The first drops all tables, creates them again and loads users and the 10,000 accounts.
 The second does the same but skips the accounts, so you can upload them as the head.
+
+To try the upload yourself, run the second command, log in as `head`, open **Upload** and choose
+`data/accounts_10000.csv`. For the 100,000-row test, create the big file first (it is not stored
+in Git) and upload it the same way:
+
+```
+docker compose exec app python -m scripts.make_big_csv
+```
+
+This writes `data/big_accounts.csv`.
 
 ## Running tests
 
