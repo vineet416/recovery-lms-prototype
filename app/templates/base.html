@@ -12,6 +12,7 @@
       <ul><li><strong>Shaha Finlease LMS</strong></li></ul>
       {% if user %}
       <ul>
+        {% if user.role == "caller" %}<li><a href="/accounts?view=queue">My queue</a></li>{% endif %}
         <li><a href="/accounts">Accounts</a></li>
         {% if user.role in ["manager", "head"] %}<li><a href="/allocation">Allocation</a></li>{% endif %}
         {% if user.role == "head" %}<li><a href="/upload">Upload</a></li>{% endif %}

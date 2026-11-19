@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Accounts</h2>
+<h2>{{ "My queue" if view == "queue" else "Accounts" }}</h2>
 <form method="get" action="/accounts" role="search">
+  {% if view == "queue" %}<input type="hidden" name="view" value="queue">{% endif %}
   <input type="search" name="q" value="{{ q }}" placeholder="Customer name, mobile or loan number">
   <select name="status">
     <option value="">All statuses</option>
@@ -18,7 +19,7 @@
 <table>
   <thead>
     <tr><th>Loan no</th><th>Customer</th><th>Mobile</th><th>Office</th>
-        <th>Outstanding</th><th>Status</th><th>Owner</th></tr>
+        <th>Outstanding</th><th>Status</th><th>Owner</th>{% if view == "queue" %}<th>Next follow-up</th>{% endif %}</tr>
   </thead>
   <tbody>
     {% for a in accounts %}
@@ -30,6 +31,7 @@
       <td>{{ "{:,.2f}".format(a.outstanding) }}</td>
       <td>{{ a.status }}</td>
       <td>{{ names.get(a.owner_id, "Unallocated") }}</td>
+      {% if view == "queue" %}<td>{{ a.next_followup or "-" }}</td>{% endif %}
     </tr>
     {% endfor %}
   </tbody>

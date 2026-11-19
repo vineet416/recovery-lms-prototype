@@ -11,10 +11,10 @@ from app.models import User
 router = APIRouter()
 
 
-# Home sends logged-in users to the account list (logged-out visitors go to /login via get_current_user).
+# Home sends callers to their queue and everyone else to the account list (logged-out visitors go to /login).
 @router.get("/")
 def home(user: User = Depends(get_current_user)):
-    return RedirectResponse("/accounts", status_code=303)
+    return RedirectResponse("/accounts?view=queue" if user.role == "caller" else "/accounts", status_code=303)
 
 
 # Shows the login form.

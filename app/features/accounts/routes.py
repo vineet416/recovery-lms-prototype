@@ -18,12 +18,13 @@ def accounts_list(
     q: str = "",
     status: str = "",
     page: str = "1",
+    view: str = "",
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    require_role(user, ROLES)
+    require_role(user, ["caller"] if view == "queue" else ROLES)
     context = {"user": user, "q": q, "status": status, "statuses": STATUSES}
-    context.update(list_accounts(db, user, q, status, page))
+    context.update(list_accounts(db, user, q, status, page, view))
     return templates.TemplateResponse(request, "accounts_list.html", context)
 
 

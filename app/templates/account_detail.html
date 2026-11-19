@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<p><a href="/accounts">&laquo; Back to accounts</a></p>
+<p>
+  {% if user.role == "caller" %}<a href="/accounts?view=queue">&laquo; Back to my queue</a>
+  {% else %}<a href="/accounts">&laquo; Back to accounts</a>{% endif %}
+</p>
 <h2>{{ account.customer_name }} <small>({{ account.loan_no }})</small></h2>
 
 <article>
@@ -29,6 +32,23 @@
     </div>
   </div>
 </article>
+
+{% if can_log_call %}
+<h3>Log a call</h3>
+<form method="post" action="/accounts/{{ account.id }}/call">
+  <select name="disposition" required>
+    <option value="">Choose disposition</option>
+    {% for d in dispositions %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+  </select>
+  <input type="text" name="remarks" placeholder="Remarks (optional)">
+  <label>Next follow-up (optional) <input type="date" name="next_followup"></label>
+  <div class="grid">
+    <label>Promise amount (only for Promise to pay) <input type="number" name="promise_amount" step="0.01" min="0"></label>
+    <label>Promise date (only for Promise to pay) <input type="date" name="promise_date"></label>
+  </div>
+  <button type="submit">Save call</button>
+</form>
+{% endif %}
 
 <h3>Call history</h3>
 {% if calls %}
