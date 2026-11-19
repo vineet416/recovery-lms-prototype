@@ -20,9 +20,13 @@ def earliest_pending_date(db: Session, account_id: int) -> date | None:
     )
 
 
-# Marks every Pending promise on the account as Kept (used when a payment comes in).
+# Marks Pending promises dated today or later as Kept (used when a payment comes in); overdue ones are left alone.
 def mark_ptps_kept(db: Session, account_id: int) -> None:
-    db.execute(update(Ptp).where(Ptp.account_id == account_id, Ptp.state == "Pending").values(state="Kept"))
+    db.execute(
+        update(Ptp)
+        .where(Ptp.account_id == account_id, Ptp.state == "Pending", Ptp.promise_date >= date.today())
+        .values(state="Kept")
+    )
 
 
 # Pending promises dated before today become Broken; PTP accounts with no Pending promise go back to Working.

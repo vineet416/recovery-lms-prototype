@@ -77,5 +77,6 @@ def get_account_page(db: Session, user: User, account_id: int) -> dict | None:
         "account": account, "calls": calls, "promises": promises, "payments": payments,
         "history": history, "names": read_names(db, ids), "dispositions": DISPOSITIONS,
         "can_log_call": user.role == "caller" and account.status not in FINAL_STATUSES,
+        "can_record_payment": user.role == "caller" and account.status not in FINAL_STATUSES,
         "office_name": read_office_names(db).get(account.office_id, ""),
     }
