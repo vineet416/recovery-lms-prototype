@@ -1,17 +1,18 @@
 from datetime import date, timedelta
 
-from sqlalchemy import update
+from sqlalchemy import select, update
 
 from app.core.database import SessionLocal
-from app.models import Ptp
+from app.models import Account, Ptp
 
 
-# Demo helper: moves every Pending promise date to yesterday so the Broken rule can be shown.
+# Demo helper: moves every Pending promise date and its account follow-up to yesterday so the Broken rule can be shown.
 def main() -> None:
+    yesterday = date.today() - timedelta(days=1)
     with SessionLocal() as db:
-        result = db.execute(
-            update(Ptp).where(Ptp.state == "Pending").values(promise_date=date.today() - timedelta(days=1))
-        )
+        pending_accounts = select(Ptp.account_id).where(Ptp.state == "Pending")
+        db.execute(update(Account).where(Account.id.in_(pending_accounts)).values(next_followup=yesterday))
+        result = db.execute(update(Ptp).where(Ptp.state == "Pending").values(promise_date=yesterday))
         db.commit()
         print(f"Backdated {result.rowcount} pending promise(s) to yesterday.")
 
